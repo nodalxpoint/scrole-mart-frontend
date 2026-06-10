@@ -1,0 +1,20 @@
+/* You can add global styles to this file, and also import other style files */
+/* src/styles.css */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #F8F4EF;
+}
+
+
+
+:root {
+  --cream: #FFF5E4; --blush: #FFE3E1; --rose: #FFD1D1;
+  --pink: #FF9494; --pink-dark: #e87575;
+  --dark: #1C1C1C; --mid: #5A4A4A; --light-mid: #9A8A8A;
+}

@@ -1,0 +1,102 @@
+/* home.component.css
+   Only imports shared variables + utilities.
+   Each sub-component has its own CSS file.
+   ─────────────────────────────────────────── */
+
+
+/* ── CSS Variables (global) ── */
+:root {
+  --cream:       #FFF5E4;
+  --blush:       #FFE3E1;
+  --rose:        #FFD1D1;
+  --pink:        #FF9494;
+  --pink-dark:   #e87575;
+  --dark:        #1C1C1C;
+  --mid:         #5A4A4A;
+  --light-mid:   #9A8A8A;
+  --white:       #FFFFFF;
+  --section-gap: 100px;
+  --radius-lg:   24px;
+  --radius-md:   16px;
+  --radius-sm:   10px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--white); color:  #1C1C1C; }
+
+/* ── Shared section layout (used by categories, trending, new-arrivals) ── */
+.section-wrapper {
+  padding: 100px 2rem;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.section-alt {
+  background:  #FFF5E4;
+  max-width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+}
+.section-alt > * {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.section-head       { text-align: center; margin-bottom: 3.5rem; }
+.section-head.light { text-align: center; margin-bottom: 3.5rem; }
+
+.section-eyebrow {
+  display: inline-block;
+  font-size: 0.75rem; font-weight: 500; letter-spacing: 3px; text-transform: uppercase;
+  color:  #e87575; margin-bottom: 0.75rem;
+}
+.section-eyebrow.light-eye { color:  #e87575; }
+
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  font-weight: 600; color:   #1C1C1C; line-height: 1.15;
+}
+.section-title em          { font-style: italic; color:  #e87575; }
+.section-title.light-title { color:   #1C1C1C; }
+
+.section-sub { font-size: 1rem; color: #9A8A8A; margin-top: 0.75rem; }
+.section-cta { text-align: center; margin-top: 3rem; }
+
+.view-all-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 13px 32px; border: 1.5px solid   #1C1C1C; color:   #1C1C1C;
+  font-size: 0.88rem; font-weight: 500; letter-spacing: 0.3px;
+  border-radius: 50px; text-decoration: none; transition: all 0.3s ease;
+}
+.view-all-btn:hover { background:   #1C1C1C; color: white; transform: translateY(-2px); }
+
+/* ── Shared animation ── */
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+/* ── Skeletons ── */
+.skeleton-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+.skeleton-cat,
+.product-skeleton {
+  border-radius: 24px;
+  background: linear-gradient(90deg, #f5e9e9 25%, #fce0e0 50%, #f5e9e9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+.skeleton-cat    { height: 140px; }
+.product-skeleton { height: 380px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.skel-img  { flex: 1; border-radius: 16px; background: rgba(255,148,148,0.12); }
+.skel-line { height: 12px; border-radius: 4px; background: rgba(255,148,148,0.15); }
+.w-70 { width: 70%; } .w-40 { width: 40%; } .w-50 { width: 50%; }
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* ── Empty state ── */
+.empty-state { text-align: center; padding: 4rem 2rem; color: #9A8A8A; }
+.empty-icon  { font-size: 3rem; display: block; margin-bottom: 1rem; }
+.empty-state p { font-size: 1.05rem; }
+
+/* ── Responsive (skeleton/grid shared) ── */
+@media (max-width: 1100px) { .skeleton-row { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 768px)  { .skeleton-row { grid-template-columns: repeat(2, 1fr); } }

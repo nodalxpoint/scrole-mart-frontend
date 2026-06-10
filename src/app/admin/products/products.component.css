@@ -1,0 +1,187 @@
+/* admin/products/products.component.css */
+
+
+:root {
+  --dark:   #1C1C1C;
+  --mid:    #5A4A4A;
+  --light:  #9A8A8A;
+  --pink:   #FF9494;
+  --pink-d: #e87575;
+  --cream:  #FFF5E4;
+  --blush:  #FFE3E1;
+  --bg:     #F8F4EF;
+  --white:  #ffffff;
+  --radius: 14px;
+  --shadow: 0 2px 16px rgba(0, 0, 0, 0.07);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; }
+
+.products-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.error-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 10px;
+  color: #dc2626;
+  font-size: 0.85rem;
+}
+.error-alert button {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+}
+
+.loading-wrap {
+  text-align: center;
+  padding: 5rem;
+  color:  #9A8A8A;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255, 148, 148, 0.2);
+  border-top-color:  #FF9494;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ════════════════════════════════════════════
+   DELETE CONFIRM POPUP
+════════════════════════════════════════════ */
+.mini-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(28,28,28,0.35);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: fadeIn 0.18s ease both;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.mini-popup {
+  display: flex; align-items: center; gap: 12px;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px 18px;
+  width: 330px; max-width: calc(100vw - 2rem);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.16), 0 2px 8px rgba(0,0,0,0.06);
+  animation: popIn 0.22s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.88); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.mini-icon-wrap {
+  width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.delete-icon { background: linear-gradient(135deg, #dc2626, #ef4444); }
+
+.mini-body { flex: 1; min-width: 0; }
+.mini-title { font-size: 0.88rem; font-weight: 600; color: #1C1C1C; }
+.mini-sub   {
+  font-size: 0.75rem; color: #9A8A8A; margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.mini-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.mini-btn {
+  padding: 7px 14px; border-radius: 8px; font-size: 0.78rem;
+  font-weight: 600; cursor: pointer; border: none;
+  font-family: 'DM Sans', sans-serif; transition: all 0.18s ease;
+}
+.mini-cancel { background: rgba(90,74,74,0.08); color: #5A4A4A; }
+.mini-cancel:hover { background: rgba(90,74,74,0.15); }
+.mini-delete { background: #dc2626; color: white; }
+.mini-delete:hover { background: #b91c1c; transform: translateY(-1px); }
+
+/* ════════════════════════════════════════════
+   SUCCESS / DELETE TOAST
+════════════════════════════════════════════ */
+.toast-wrap {
+  position: fixed; bottom: 28px; right: 28px; z-index: 1001;
+}
+
+.toast-popup {
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; gap: 10px;
+  background: #1C1C1C;
+  border-radius: 14px;
+  padding: 13px 14px;
+  min-width: 270px; max-width: 340px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.1);
+  cursor: pointer;
+  animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(18px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* success = green icon, delete = red icon */
+.toast-icon {
+  width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+  background: linear-gradient(135deg, #16a34a, #22c55e);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 10px rgba(34,197,94,0.35);
+  animation: iconPop 0.35s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;
+}
+.toast-delete .toast-icon {
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  box-shadow: 0 4px 10px rgba(220,38,38,0.35);
+}
+@keyframes iconPop {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+
+.toast-text  { flex: 1; min-width: 0; }
+.toast-title { display: block; font-size: 0.84rem; font-weight: 600; color: #ffffff; }
+.toast-sub   {
+  display: block; font-size: 0.72rem; color: rgba(255,255,255,0.5);
+  margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.toast-close {
+  width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0;
+  border: none; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s ease;
+}
+.toast-close:hover { background: rgba(255,255,255,0.18); color: white; }
+
+/* Progress bar */
+.toast-bar {
+  position: absolute; bottom: 0; left: 0; height: 2px;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  animation: barShrink 3.5s linear both;
+}
+.toast-bar-delete {
+  background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+@keyframes barShrink {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+
+@media (max-width: 768px) {
+  .toast-wrap { bottom: 16px; right: 16px; left: 16px; }
+  .toast-popup { min-width: unset; max-width: 100%; }
+}

@@ -1,0 +1,54 @@
+<!-- home.component.html -->
+
+<app-hero
+  [heroVisible]="heroVisible"
+  [heroSlide]="heroSlide"
+  [heroSlides]="heroSlides"
+  (setSlide)="setHeroSlide($event)"
+  (slideClicked)="goToProduct($event)" 
+  (browseCategoriesClick)="scrollToCategories()"
+></app-hero>
+
+<app-offer-strip></app-offer-strip>
+
+<div #categoriesSection>
+  <app-categories
+    [categories]="categories"
+    [loading]="loadingCategories"
+    [visible]="catsVisible"
+  ></app-categories>
+</div>
+
+<div #trendingSection>
+  <app-trending
+    [products]="trendingProducts"
+    [loading]="loadingTrending"
+    [visible]="trendingVisible"
+    [pendingQtys]="pendingQuantities"
+    [cartedProducts]="cartedProducts"
+    (productClick)="goToProduct($event)"
+    (increment)="incrementQty($event)"
+    (decrement)="decrementQty($event)"
+    (addToCart)="addToCart($event)"
+  ></app-trending>
+</div>
+
+<app-offer-banner></app-offer-banner>
+
+<div #newArrivalsSection>
+  <app-new-arrivals
+    [products]="recentProducts"
+    [loading]="loadingRecent"
+    [visible]="newArrivalsVisible"
+    [pendingQtys]="pendingQuantities"
+    [cartedProducts]="cartedProducts"
+    (productClick)="goToProduct($event)"
+    (increment)="incrementQty($event)"
+    (decrement)="decrementQty($event)"
+    (addToCart)="addToCart($event)"
+  ></app-new-arrivals>
+</div>
+
+<div #whySection>
+  <app-why-us [visible]="whyVisible"></app-why-us>
+</div>

@@ -1,0 +1,260 @@
+<!-- admin/products/product-form-modal/product-form-modal.component.html -->
+<div class="modal-overlay" *ngIf="show" (click)="onClose.emit()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+
+    <!-- ── Header ── -->
+    <div class="modal-head">
+      <div class="modal-head-left">
+        <div class="modal-head-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/>
+            <line x1="7" y1="7" x2="7.01" y2="7"/>
+          </svg>
+        </div>
+        <h2>{{ editingProduct ? 'Edit' : 'New' }} <em>Product</em></h2>
+      </div>
+      <button class="btn-close" (click)="onClose.emit()" type="button">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- ── Error ── -->
+    <div class="error-alert" *ngIf="error">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      {{ error }}
+    </div>
+
+    <form (ngSubmit)="submitForm()" novalidate>
+      <div class="form-scroll">
+
+        <!-- ══════════════════════════════════
+             SECTION 1 — Basic Info
+        ══════════════════════════════════ -->
+        <div class="form-section">
+          <div class="section-title">
+            <span class="section-title-dot"></span>
+            Basic Info
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Product Name <span class="req">*</span></label>
+            <input type="text" [(ngModel)]="formData.name" name="name" required
+                   placeholder="e.g. Floral Anarkali Kurti">
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Description</label>
+            <textarea [(ngModel)]="formData.description" name="description"
+                      rows="3" placeholder="Short product description..."></textarea>
+          </div>
+
+          <div class="form-row-2">
+            <div class="field-group">
+              <label class="field-label">Category <span class="req">*</span></label>
+              <select [(ngModel)]="formData.categoryId" name="categoryId" required
+                      [class.placeholder-sel]="!formData.categoryId">
+                <option [ngValue]="0" disabled>— Select category —</option>
+                <option *ngFor="let cat of categories" [ngValue]="cat.id">{{ cat.name }}</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Trending</label>
+              <select [(ngModel)]="formData.trending" name="trending">
+                <option value="N">N</option>
+                <option value="Y">Y</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Status</label>
+            <div class="toggle-row">
+              <button type="button"
+                      class="toggle-btn"
+                      [class.is-active]="formData.isActive"
+                      (click)="formData.isActive = true">
+                <span class="toggle-dot"></span> Active
+              </button>
+              <button type="button"
+                      class="toggle-btn"
+                      [class.is-inactive]="!formData.isActive"
+                      (click)="formData.isActive = false">
+                <span class="toggle-dot"></span> Inactive
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══════════════════════════════════
+             SECTION 2 — Size Variants
+        ══════════════════════════════════ -->
+        <div class="form-section">
+          <div class="section-title">
+            <span class="section-title-dot"></span>
+            Size Variants <span class="req">*</span>
+          </div>
+
+          <!-- Variant rows -->
+          <div class="variants-list" *ngIf="formData.variants.length">
+            <div class="variant-row"
+                 *ngFor="let variant of formData.variants; let i = index">
+
+              <div class="variant-field">
+                <span class="variant-label">Size</span>
+                <select [(ngModel)]="variant.size" [name]="'size_' + i" class="variant-select">
+                  <option value="" disabled>—</option>
+                  <option *ngFor="let s of getAvailableSizes(i)" [value]="s">{{ s }}</option>
+                  <option *ngIf="variant.size && !SIZE_OPTIONS.includes(variant.size)"
+                          [value]="variant.size">{{ variant.size }}</option>
+                </select>
+              </div>
+
+              <div class="variant-field">
+                <span class="variant-label">Price (₹)</span>
+                <input type="number" [(ngModel)]="variant.price" [name]="'price_' + i"
+                       min="1" placeholder="799" class="variant-input">
+              </div>
+
+              <div class="variant-field">
+                <span class="variant-label">Stock</span>
+                <input type="number" [(ngModel)]="variant.stock" [name]="'stock_' + i"
+                       min="0" placeholder="50" class="variant-input">
+              </div>
+
+              <button type="button" class="variant-remove" (click)="removeVariant(i)" title="Remove">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2.5" stroke-linecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Add button -->
+          <button type="button" class="btn-add-variant"
+                  (click)="addVariant()"
+                  [disabled]="formData.variants.length >= SIZE_OPTIONS.length">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2.5" stroke-linecap="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Add Size
+            <span class="variant-count-badge" *ngIf="formData.variants.length">
+              {{ formData.variants.length }}/{{ SIZE_OPTIONS.length }}
+            </span>
+          </button>
+        </div>
+
+        <!-- ══════════════════════════════════
+             SECTION 3 — Images
+        ══════════════════════════════════ -->
+        <div class="form-section">
+          <div class="section-title">
+            <span class="section-title-dot"></span>
+            {{ editingProduct ? 'Manage Images' : 'Product Images' }}
+          </div>
+
+          <!-- Existing images (edit mode) -->
+          <div *ngIf="editingProduct && localImages.length">
+            <div class="img-grid">
+              <div *ngFor="let img of localImages; let i = index"
+                   class="img-thumb"
+                   [class.primary]="i === 0"
+                   [class.marked-delete]="isMarkedForDelete(img.id)"
+                   (click)="!isMarkedForDelete(img.id) && setPrimaryImage(i)">
+
+                <img [src]="resolveImage(img.imageUrl)" alt="">
+
+                <div class="primary-crown" *ngIf="i === 0 && !isMarkedForDelete(img.id)">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                  Front
+                </div>
+
+                <button type="button" class="img-remove"
+                        (click)="$event.stopPropagation(); toggleDeleteImage(img.id)"
+                        [title]="isMarkedForDelete(img.id) ? 'Undo' : 'Remove'">
+                  <svg *ngIf="!isMarkedForDelete(img.id)" width="9" height="9" viewBox="0 0 24 24"
+                       fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                  <svg *ngIf="isMarkedForDelete(img.id)" width="9" height="9" viewBox="0 0 24 24"
+                       fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="1 4 1 10 7 10"/>
+                    <path d="M3.51 15a9 9 0 1 0 .49-3.37"/>
+                  </svg>
+                </button>
+
+                <div class="set-front-hint" *ngIf="i !== 0 && !isMarkedForDelete(img.id)">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                  Set front
+                </div>
+              </div>
+            </div>
+
+            <p class="delete-note" *ngIf="deleteImageIds.length" style="margin-top:10px">
+              {{ deleteImageIds.length }} image{{ deleteImageIds.length > 1 ? 's' : '' }} will be removed on save
+            </p>
+          </div>
+
+          <!-- Upload zone -->
+          <div class="upload-zone" (click)="fileInput.click()"
+               (dragover)="$event.preventDefault()" (drop)="onDrop($event)">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+              <path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/>
+            </svg>
+            <p class="upload-zone-title">Click or drag to upload</p>
+            <span class="upload-zone-sub">PNG · JPG · WEBP · max 5MB each</span>
+          </div>
+          <input #fileInput type="file" multiple accept="image/*"
+                 (change)="onFileChange($event)" style="display:none">
+
+          <!-- New file previews -->
+          <div class="img-grid" *ngIf="selectedFiles.length" style="margin-top:4px">
+            <div *ngFor="let file of selectedFilesPreviews; let i = index"
+                 class="img-thumb new-img">
+              <img [src]="file" alt="">
+              <div class="primary-crown" *ngIf="!editingProduct && i === 0">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                Front
+              </div>
+              <button type="button" class="img-remove" (click)="removeSelectedFile(i)">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="3" stroke-linecap="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /form-scroll -->
+
+      <!-- ── Footer ── -->
+      <div class="form-actions">
+        <button type="button" class="btn-cancel" (click)="onClose.emit()">Cancel</button>
+        <button type="submit" class="btn-save" [disabled]="saving">
+          <span class="spinner-sm" *ngIf="saving"></span>
+          {{ saving ? 'Saving...' : (editingProduct ? 'Update Product' : 'Add Product') }}
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>

@@ -1,0 +1,169 @@
+// category-products.component.ts
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { Subject, takeUntil } from 'rxjs';
+import { environment } from '../../../environments/environments';
+import { ProductCardComponent } from '../home/shared/product-card/product-card.component';
+
+interface ProductImage {
+  id: number;
+  imageUrl: string;
+}
+
+interface Variant {
+  id: number;
+  size: string;
+  price: number;
+  stock: number;
+}
+
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  trending: string;
+  isActive: boolean;
+  productImages: ProductImage[];
+  variants: Variant[];
+  category: { id: number; name: string; description: string };
+}
+
+interface ApiResponse {
+  content: Product[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+  last: boolean;
+  first: boolean;
+}
+
+@Component({
+  selector: 'app-category-products',
+  standalone: true,
+  imports: [CommonModule, ProductCardComponent],
+  templateUrl: './category-products.component.html',
+  styleUrl: './category-products.component.css',
+})
+export class CategoryProductsComponent implements OnInit, OnDestroy {
+  private route   = inject(ActivatedRoute);
+  private router  = inject(Router);
+  private http    = inject(HttpClient);
+  private destroy = new Subject<void>();
+
+  categoryName = '';
+  categoryId   = 0;
+  products: any[] = [];
+  loading      = true;
+  error        = false;
+
+  currentPage  = 0;
+  totalPages   = 0;
+  totalItems   = 0;
+  pageSize     = 12;
+
+  ngOnInit(): void {
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy))
+      .subscribe(params => {
+        const newName = params['name'] ?? '';
+        const newId   = +params['id'] || 0;
+
+        if (newName !== this.categoryName || newId !== this.categoryId) {
+          this.categoryName = newName;
+          this.categoryId   = newId;
+          this.currentPage  = 0;
+          this.fetchProducts();
+        }
+      });
+  }
+
+  fetchProducts(): void {
+    if (!this.categoryName) {
+      this.error   = true;
+      this.loading = false;
+      return;
+    }
+
+    this.loading  = true;
+    this.error    = false;
+    this.products = [];
+
+    const url = `${environment.apiUrl}/product/getallproducts`
+      + `?category=${encodeURIComponent(this.categoryName)}`
+      + `&page=${this.currentPage}`
+      + `&size=${this.pageSize}`;
+
+    this.http.get<ApiResponse>(url)
+      .pipe(takeUntil(this.destroy))
+      .subscribe({
+        next: (res) => {
+          // ProductCardComponent ke format mein map karo
+          this.products = res.content.map(p => ({
+            id:          p.id,
+            name:        p.name,
+            description: p.description,
+            price:       p.price,
+            stock:       p.stock,
+            trending:    p.trending,
+            isActive:    p.isActive,
+            // ProductCard expects image as array of URLs
+            image: p.productImages?.map(img =>
+              img.imageUrl.startsWith('http')
+                ? img.imageUrl
+                : `${environment.imageBaseUrl}${img.imageUrl}`
+            ) ?? [],
+            variants:  p.variants ?? [],
+            category:  p.category,
+          }));
+          this.totalPages = res.totalPages;
+          this.totalItems = res.totalElements;
+          this.loading    = false;
+        },
+        error: () => {
+          this.error   = true;
+          this.loading = false;
+        },
+      });
+  }
+
+  onProductClick(productId: number): void {
+    this.router.navigate(['/products', productId]);
+  }
+
+  getBadgeLabel(product: any): string {
+    if (product.trending === 'y') return '🔥 Trending';
+    if (product.stock === 0)      return 'Sold Out';
+    if (product.stock <= 5)       return 'Low Stock';
+    return '';
+  }
+
+  getBadgeClass(product: any): string {
+    if (product.trending === 'y') return 'badge-trending';
+    return 'badge-new';
+  }
+
+  goToPage(page: number): void {
+    if (page < 0 || page >= this.totalPages) return;
+    this.currentPage = page;
+    this.fetchProducts();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  getPageNumbers(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i);
+  }
+
+  goBack(): void {
+    this.router.navigate(['/']);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy.next();
+    this.destroy.complete();
+  }
+}

@@ -1,0 +1,25 @@
+<!-- src/app/app.html -->
+
+<!-- User Header — admin routes pe nahi dikhega -->
+<app-header *ngIf="!isAdminRoute"></app-header>
+
+<!-- Page Content — admin routes pe main tag nahi chahiye -->
+<main *ngIf="!isAdminRoute">
+  <router-outlet *ngIf="!isAdminRoute"></router-outlet>
+</main>
+
+<!-- Admin routes ka router-outlet alag — koi wrapper nahi -->
+<router-outlet *ngIf="isAdminRoute"></router-outlet>
+
+<!-- User Footer — admin routes pe nahi dikhega -->
+<app-footer *ngIf="!isAdminRoute"></app-footer>
+
+<!-- Floating Cart FAB — sirf user routes pe -->
+<div class="fab-cart" routerLink="/cart" *ngIf="cartCount > 0 && !isAdminRoute">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+    <line x1="3" y1="6" x2="21" y2="6"/>
+    <path d="M16 10a4 4 0 01-8 0"/>
+  </svg>
+  <span class="fab-count">{{ cartCount }}</span>
+</div>

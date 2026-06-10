@@ -1,0 +1,21 @@
+<!-- product-pagination.component.html -->
+<div class="pagination" *ngIf="totalPages > 1">
+  <button class="page-btn prev" [disabled]="currentPage === 0" (click)="pageChange.emit(currentPage - 1)">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M15 18l-6-6 6-6"/>
+    </svg>
+  </button>
+
+  <ng-container *ngFor="let p of pageNumbers">
+    <button *ngIf="p !== -1" class="page-btn num" [class.active]="p === currentPage" (click)="pageChange.emit(p)">
+      {{ p + 1 }}
+    </button>
+    <span *ngIf="p === -1" class="page-ellipsis">…</span>
+  </ng-container>
+
+  <button class="page-btn next" [disabled]="currentPage === totalPages - 1" (click)="pageChange.emit(currentPage + 1)">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M9 18l6-6-6-6"/>
+    </svg>
+  </button>
+</div>

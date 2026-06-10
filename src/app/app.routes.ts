@@ -1,0 +1,167 @@
+// src/app/app.routes.ts
+import { Routes } from '@angular/router';
+import { AdminLayoutComponent } from './admin/admin-layout/admin-layout.component';
+
+// ── Auth Guard ─────────────────────────────────────────────────────
+const adminGuard = () => {
+  if (localStorage.getItem('admin_token')) return true;
+  window.location.href = '/admin/login';
+  return false;
+};
+
+export const routes: Routes = [
+  // ──────────────── User / Public Routes ────────────────
+  {
+    path: '',
+    loadComponent: () => import('./components/home/home').then((m) => m.Home),
+  },
+  {
+    path: 'about',
+    loadComponent: () => import('./components/about/about').then((m) => m.About),
+  },
+  {
+    path: 'categories-products',
+    loadComponent: () =>
+      import('./components/category-products/category-products.component').then(
+        (m) => m.CategoryProductsComponent,
+      ),
+  },
+  {
+    path: 'contact',
+    loadComponent: () => import('./components/contact/contact').then((m) => m.Contact),
+  },
+  {
+    path: 'category-products',
+    loadComponent: () =>
+      import('./components/category-products/category-products.component').then(
+        (m) => m.CategoryProductsComponent,
+      ),
+  },
+  {
+    path: 'products',
+    loadComponent: () =>
+      import('./components/all-products/all-products.component').then(
+        (m) => m.AllProductsComponent,
+      ),
+  },
+  {
+    path: 'products/:id',
+    loadComponent: () =>
+      import('./components/product-detail/product-detail').then((m) => m.ProductDetail),
+  },
+  {
+    path: 'cart',
+    loadComponent: () => import('./components/cart/cart').then((m) => m.Cart),
+  },
+  {
+    path: 'track-order',
+    loadComponent: () => import('./components/track-order/track-order.component').then((m) => m.TrackOrderComponent),
+  },
+  {
+    path: 'checkout',
+    loadComponent: () => import('./components/checkout/checkout.component').then((m) => m.Checkout),
+  },
+  {
+    path: 'order-success',
+    loadComponent: () =>
+      import('./components/order-success/order-success.component').then(
+        (m) => m.OrderSuccessComponent,
+      ),
+  },
+
+  // ──────────────── Admin Routes ────────────────
+  // Login page — NO admin layout (no navbar/footer)
+  {
+    path: 'admin/login',
+    loadComponent: () => import('./admin/login/login.component').then((m) => m.AdminLoginComponent),
+  },
+
+  // Admin panel — AdminLayoutComponent wraps all child pages
+  // Header/Footer component app.html mein *ngIf se admin routes pe hide karte hain
+  {
+    path: 'admin',
+    component: AdminLayoutComponent,
+    canActivate: [adminGuard],
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./admin/dashboard/dashboard.component').then((m) => m.DashboardComponent),
+      },
+      {
+        path: 'products',
+        loadComponent: () =>
+          import('./admin/products/products.component').then((m) => m.AdminProductsComponent),
+      },
+      {
+        path: 'orders',
+        loadComponent: () =>
+          import('./admin/orders/orders.component').then((m) => m.AdminOrdersComponent),
+      },
+      {
+        path: 'orders/:id',
+        loadComponent: () =>
+          import('./admin/order-detail/order-detail.component').then((m) => m.OrderDetailComponent),
+      },
+      {
+        path: 'dispatched',
+        loadComponent: () =>
+          import('./admin/dispatched/dispatched-orders/dispatched-orders.component').then(
+            (m) => m.DispatchedOrdersComponent,
+          ),
+      },
+      {
+        path: 'dispatched/:id',
+        loadComponent: () =>
+          import('./admin/dispatched/dispatched-order-detail/dispatched-order-detail.component').then(
+            (m) => m.DispatchedOrderDetailComponent,
+          ),
+      },
+      {
+        path: 'delivered',
+        loadComponent: () =>
+          import('./admin/delivered/delivered-orders/delivered-orders.component').then(
+            (m) => m.DeliveredOrdersComponent,
+          ),
+      },
+      {
+        path: 'delivered/:id',
+        loadComponent: () =>
+          import('./admin/delivered/delivered-order-detail/delivered-order-detail.component').then(
+            (m) => m.DeliveredOrderDetailComponent,
+          ),
+      },
+      {
+        path: 'cancelled',
+        loadComponent: () =>
+          import('./admin/cancelled/cancelled-orders/cancelled-orders.component').then(
+            (m) => m.CancelledOrdersComponent,
+          ),
+      },
+      {
+        path: 'cancelled/:id',
+        loadComponent: () =>
+          import('./admin/cancelled/cancelled-order-detail/cancelled-order-detail.component').then(
+            (m) => m.CancelledOrderDetailComponent,
+          ),
+      },
+      {
+        path: 'categories',
+        loadComponent: () =>
+          import('./admin/categories/categories.component').then((m) => m.CategoriesComponent),
+      },
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+    ],
+  },
+
+  // ──────────────── Wildcard ────────────────
+  {
+    path: '**',
+    redirectTo: '',
+    pathMatch: 'full',
+  },
+];

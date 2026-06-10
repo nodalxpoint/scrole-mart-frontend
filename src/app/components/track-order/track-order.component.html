@@ -1,0 +1,76 @@
+<!-- track-order/track-order.component.html -->
+
+<!-- ── HERO ── -->
+<section class="track-hero">
+  <div class="hero-eyebrow">Track Your Order</div>
+  <h1>Where is your <em>kurti</em> right now?</h1>
+  <p>Enter your tracking ID to get live shipment status</p>
+</section>
+
+<!-- ── SEARCH CARD ── -->
+<section class="search-section">
+  <div class="search-card">
+    <label for="trackInput">Tracking ID</label>
+
+    <div class="search-input-wrap">
+      <input
+        id="trackInput"
+        class="search-input"
+        type="text"
+        placeholder="e.g. TRK-3A9402DFD0F63"
+        [(ngModel)]="trackingKey"
+        (keydown.enter)="onTrack()"
+        autocomplete="off"
+      />
+      <button class="search-btn" (click)="onTrack()" [disabled]="loading">
+        <svg *ngIf="!loading" width="14" height="14" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <span class="btn-spinner" *ngIf="loading"></span>
+        {{ loading ? 'Tracking…' : 'Track' }}
+      </button>
+    </div>
+
+    <!-- Error inline -->
+    <p class="input-error" *ngIf="error">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      {{ error }}
+    </p>
+  </div>
+</section>
+
+<!-- ── RESULT CHILD COMPONENT ── -->
+<app-track-order-result
+  *ngIf="orderData"
+  [trackingKey]="lastTracked"
+  [orderData]="orderData"
+></app-track-order-result>
+
+<!-- ── HELP STRIP ── -->
+<div class="help-strip">
+  <div class="help-inner">
+    <p><strong>Need help?</strong> Our team is available Mon–Sat, 10am–7pm IST</p>
+    <div class="help-chips">
+      <!-- <span class="help-chip">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 01-.07 1.13 2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+        </svg>
+        +91 98765 43210
+      </span> -->
+      <span class="help-chip">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        khilatenterprises2023&#64;gmail.com
+      </span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,84 @@
+/* product-header.component.css */
+
+/* all-products.component.css */
+
+
+/* ─────────────────────────────────────────
+   CSS VARIABLES (global — shared by all child components)
+───────────────────────────────────────── */
+:root {
+  --cream:       #FFF5E4;
+  --blush:       #FFE3E1;
+  --rose:        #FFD1D1;
+  --pink:        #FF9494;
+  --pink-dark:   #e87575;
+  --dark:        #1C1C1C;
+  --mid:         #5A4A4A;
+  --muted:       #9A8A8A;
+  --white:       #FFFFFF;
+  --border:      rgba(90, 74, 74, 0.12);
+  --radius-xl:   24px;
+  --radius-lg:   16px;
+  --radius-md:   12px;
+  --radius-sm:   8px;
+  --radius-pill: 999px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+
+.shop-header {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(150deg, #FFF5E4 0%, #FFE3E1 60%, #FFD1D1 100%);
+  padding: 64px 2rem 52px;
+  text-align: center;
+}
+.shop-header-bg { position: absolute; inset: 0; pointer-events: none; }
+.header-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.35;
+  animation: blobFloat 8s ease-in-out infinite;
+}
+.b1 { width: 400px; height: 400px; background: #FFD1D1; top: -150px; right: -80px; }
+.b2 { width: 250px; height: 250px; background: #FF9494; bottom: -80px; left: 5%; animation-delay: 3s; opacity: 0.2; }
+@keyframes blobFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-20px) scale(1.04); }
+}
+.shop-header-inner { position: relative; z-index: 2; }
+
+.breadcrumb-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color:   #9A8A8A;
+  margin-bottom: 1.25rem;
+}
+.bc-link { color: #e87575; text-decoration: none; }
+.bc-link:hover { text-decoration: underline; }
+.bc-sep { color:   #9A8A8A; }
+
+.shop-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 600;
+  color:  #1C1C1C;
+  line-height: 1.1;
+  margin-bottom: 0.75rem;
+}
+.shop-title em { font-style: italic; color: #e87575; }
+.shop-subtitle {
+  font-size: 1rem;
+  color:    #5A4A4A;
+  max-width: 400px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .shop-header { padding: 44px 1.25rem 38px; }
+}

@@ -1,0 +1,86 @@
+<!-- src/app/admin/dashboard/dashboard.component.html -->
+<div class="dash-page">
+
+  <!-- ══ SKELETON LOADING (replaces blank spinner wait) ══ -->
+  <ng-container *ngIf="loading">
+    <div class="dash-skeleton">
+
+      <!-- Hero skeleton -->
+      <div class="skel skel-hero"></div>
+
+      <!-- Stats grid skeleton -->
+      <div class="skel-stats">
+        <div class="skel skel-stat-card"></div>
+        <div class="skel skel-stat-card"></div>
+        <div class="skel skel-stat-card"></div>
+        <div class="skel skel-stat-card"></div>
+        <div class="skel skel-stat-card"></div>
+        <div class="skel skel-stat-card"></div>
+      </div>
+
+      <!-- Chart + recent orders skeleton -->
+      <div class="skel-bottom">
+        <div class="skel skel-chart"></div>
+        <div class="skel skel-recent"></div>
+      </div>
+
+    </div>
+  </ng-container>
+
+  <!-- ══ ERROR ══ -->
+  <div class="dash-error" *ngIf="error && !loading">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    {{ error }}
+  </div>
+
+  <!-- ══ DASHBOARD CONTENT ══ -->
+  <ng-container *ngIf="!loading && !error">
+
+    <!-- Hero banner -->
+    <div class="dash-hero">
+      <div class="hero-left">
+        <p class="hero-greeting">{{ greeting }},</p>
+        <h1 class="hero-name">{{ adminName }} 👋</h1>
+        <p class="hero-sub">Here's what's happening with your store right now.</p>
+      </div>
+      <div class="hero-right">
+        <a routerLink="/admin/orders" class="hero-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          Orders
+        </a>
+        <a routerLink="/admin/dispatched" class="hero-btn hero-btn-purple">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          Dispatched
+        </a>
+        <a routerLink="/admin/products" class="hero-btn hero-btn-teal">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+          </svg>
+          Products
+        </a>
+      </div>
+    </div>
+
+    <!-- Stat cards -->
+    <app-dash-stats-cards [stats]="stats"></app-dash-stats-cards>
+
+    <!-- Chart + recent orders -->
+    <div class="dash-bottom-grid">
+      <app-dash-orders-chart [orders]="allOrdersForChart"></app-dash-orders-chart>
+      <app-dash-recent-orders [orders]="recentOrders"></app-dash-recent-orders>
+    </div>
+
+  </ng-container>
+
+</div>

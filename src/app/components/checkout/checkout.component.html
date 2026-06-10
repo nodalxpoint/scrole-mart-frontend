@@ -1,0 +1,45 @@
+<!-- src/app/components/checkout/checkout.component.html -->
+<div class="checkout-page">
+  <div class="checkout-container">
+
+    <h1 class="page-title">Checkout</h1>
+
+    <app-checkout-steps [currentStep]="currentStep"></app-checkout-steps>
+
+    <div class="global-error" *ngIf="errorMessage && currentStep === 1">
+      {{ errorMessage }}
+    </div>
+
+    <div class="checkout-layout">
+
+      <div class="left-col">
+
+        <app-shipping-form
+          *ngIf="currentStep === 1"
+          [form]="form"
+          [loading]="loading"
+          (formSubmitted)="onShippingSubmitted($event)">
+        </app-shipping-form>
+
+        <app-payment-form
+          *ngIf="currentStep === 2"
+          [form]="form"
+          [razorpayOrderId]="razorpayOrderId"
+          [total]="total"
+          (goBack)="goBackToShipping()"
+          (paymentSuccess)="onPaymentSuccess($event)"
+          (paymentFailed)="onPaymentFailed($event)">
+        </app-payment-form>
+
+      </div>
+
+      <app-order-summary
+        [cartItems]="cartItems"
+        [subtotal]="subtotal"
+        [shipping]="shipping"
+        [total]="total">
+      </app-order-summary>
+
+    </div>
+  </div>
+</div>

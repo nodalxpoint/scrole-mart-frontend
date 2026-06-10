@@ -1,0 +1,153 @@
+/* offer-banner.component.css */
+:root {
+  --cream:       #FFF5E4;
+  --blush:       #FFE3E1;
+  --rose:        #FFD1D1;
+  --pink:        #FF9494;
+  --pink-dark:   #e87575;
+  --dark:        #1C1C1C;
+  --mid:         #5A4A4A;
+  --light-mid:   #9A8A8A;
+  --white:       #FFFFFF;
+  --section-gap: 100px;
+  --radius-lg:   24px;
+  --radius-md:   16px;
+  --radius-sm:   10px;
+}
+
+/* ── Brand Banner (no-offer state) ───────────────────────── */
+.offer-banner-section {
+  background: linear-gradient(135deg, #2d1b1b 0%, #1C1C1C 60%, #2a1515 100%);
+  padding: 80px 2rem;
+  overflow: hidden;
+  position: relative;
+}
+
+/* subtle grain overlay */
+.offer-banner-section::before {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0;
+}
+
+.offer-banner-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  position: relative; z-index: 1;
+}
+
+/* ── Text side ── */
+.offer-banner-text { color: white; }
+
+.offer-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 0.72rem; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase;
+  color: var(--pink); background: rgba(255,148,148,0.12);
+  padding: 6px 14px; border-radius: 20px; margin-bottom: 1.5rem;
+  border: 1px solid rgba(255,148,148,0.25);
+}
+.offer-tag::before {
+  content: '';
+  display: inline-block; width: 6px; height: 6px;
+  background: var(--pink); border-radius: 50%;
+  animation: tagBlink 2s ease-in-out infinite;
+}
+@keyframes tagBlink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.offer-headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
+  font-weight: 600; line-height: 1.15; margin-bottom: 1.25rem; color: white;
+}
+.offer-headline em { font-style: italic; color: var(--pink); }
+
+.offer-desc {
+  font-size: 1rem; color: rgba(255,255,255,0.6);
+  line-height: 1.75; margin-bottom: 2rem; max-width: 400px;
+}
+
+/* Pillars row */
+.brand-pillars {
+  display: flex; gap: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap;
+}
+.brand-pillar {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.8rem; color: rgba(255,255,255,0.55);
+  letter-spacing: 0.5px;
+}
+.brand-pillar span.icon {
+  font-size: 1rem; color: var(--pink);
+}
+
+.offer-cta-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 14px 34px; background: var(--pink); color: white;
+  font-size: 0.9rem; font-weight: 600; letter-spacing: 0.5px;
+  border-radius: 50px; text-decoration: none; transition: all 0.3s ease;
+  box-shadow: 0 8px 28px rgba(255,148,148,0.4);
+}
+.offer-cta-btn:hover {
+  background: var(--pink-dark); transform: translateY(-3px);
+  box-shadow: 0 14px 36px rgba(255,100,100,0.45); color: white;
+}
+
+/* ── Visual side ── */
+.offer-banner-visual {
+  position: relative; height: 280px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* animated rings */
+.offer-circle {
+  position: absolute; border-radius: 50%;
+  animation: offerPulse 4s ease-in-out infinite;
+}
+.c1 { width: 260px; height: 260px; background: rgba(255,148,148,0.06); border: 1.5px solid rgba(255,148,148,0.18); }
+.c2 { width: 190px; height: 190px; background: rgba(255,148,148,0.09); border: 1.5px solid rgba(255,148,148,0.28); animation-delay: 0.8s; }
+.c3 { width: 120px; height: 120px; background: rgba(255,148,148,0.13); animation-delay: 1.6s; }
+
+@keyframes offerPulse {
+  0%,100% { transform: scale(1);    opacity: 0.7; }
+  50%      { transform: scale(1.06); opacity: 1;   }
+}
+
+/* centre badge — brand mark */
+.offer-discount-badge {
+  position: relative; z-index: 5;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  text-align: center;
+}
+.brand-since {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.7rem; font-weight: 500; letter-spacing: 4px; text-transform: uppercase;
+  color: rgba(255,148,148,0.6);
+}
+.brand-mark-year {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 4.5rem; font-weight: 600; color: var(--pink);
+  line-height: 1; letter-spacing: -2px;
+}
+.brand-mark-label {
+  font-size: 0.65rem; letter-spacing: 3px; text-transform: uppercase;
+  color: rgba(255,255,255,0.4); font-weight: 500;
+}
+
+/* floating corner accent lines */
+.corner-accent {
+  position: absolute; width: 30px; height: 30px;
+  border-color: rgba(255,148,148,0.35); border-style: solid;
+}
+.ca-tl { top: 16px;  left: 16px;  border-width: 2px 0 0 2px; }
+.ca-tr { top: 16px;  right: 16px; border-width: 2px 2px 0 0; }
+.ca-bl { bottom: 16px; left: 16px;  border-width: 0 0 2px 2px; }
+.ca-br { bottom: 16px; right: 16px; border-width: 0 2px 2px 0; }
+
+@media (max-width: 900px) {
+  .offer-banner-inner  { grid-template-columns: 1fr; gap: 2rem; }
+  .offer-banner-visual { height: 200px; }
+}

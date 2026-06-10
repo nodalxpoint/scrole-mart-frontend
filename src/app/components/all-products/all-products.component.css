@@ -1,0 +1,147 @@
+/* all-products.component.css */
+
+/* ─────────────────────────────────────────
+   CSS VARIABLES (global — shared by all child components)
+───────────────────────────────────────── */
+:root {
+  --cream:       #FFF5E4;
+  --blush:       #FFE3E1;
+  --rose:        #FFD1D1;
+  --pink:        #FF9494;
+  --pink-dark:   #e87575;
+  --dark:        #1C1C1C;
+  --mid:         #5A4A4A;
+  --muted:       #9A8A8A;
+  --white:       #FFFFFF;
+  --border:      rgba(90, 74, 74, 0.12);
+  --radius-xl:   24px;
+  --radius-lg:   16px;
+  --radius-md:   12px;
+  --radius-sm:   8px;
+  --radius-pill: 999px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ─────────────────────────────────────────
+   PAGE SHELL
+───────────────────────────────────────── */
+.shop-page {
+  min-height: 100vh;
+  background: #FFFFFF;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ─────────────────────────────────────────
+   LAYOUT
+───────────────────────────────────────── */
+.shop-layout {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem 5rem;
+  display: grid;
+  grid-template-columns: 268px 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* ─────────────────────────────────────────
+   SIDEBAR BACKDROP (mobile)
+───────────────────────────────────────── */
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 199;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.sidebar-backdrop.visible { opacity: 1; pointer-events: all; }
+@media (max-width: 860px) {
+  .sidebar-backdrop { display: block; }
+}
+
+/* ─────────────────────────────────────────
+   PRODUCTS AREA
+───────────────────────────────────────── */
+.products-area { min-width: 0; }
+
+/* ─────────────────────────────────────────
+   SKELETON
+───────────────────────────────────────── */
+.shimmer {
+  background: linear-gradient(90deg, #f0e8e8 25%, #ffe0e0 50%, #f0e8e8 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.skel-card { height: 480px; border-radius: 24px; }
+
+/* ─────────────────────────────────────────
+   PRODUCT GRID / LIST
+───────────────────────────────────────── */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1.5rem;
+}
+.products-list { display: flex; flex-direction: column; gap: 1rem; }
+
+/* ─────────────────────────────────────────
+   EMPTY STATE
+───────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+.empty-icon { font-size: 3rem; }
+.empty-state h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem; font-weight: 600; color:  #1C1C1C;
+}
+.empty-state p { font-size: 0.88rem; color:  #9A8A8A; }
+.clear-filters-btn {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  width: auto; padding: 10px 28px; margin-top: 0.5rem;
+  background: none; border: 1.5px solid  #FFD1D1;
+  border-radius: 12px;
+  color:  #e87575; font-size: 0.84rem; font-family: 'DM Sans', sans-serif;
+  cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease;
+}
+.clear-filters-btn:hover { background: rgba(255,209,209,0.25); border-color:  #e87575; }
+
+/* ─────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .shop-layout { grid-template-columns: 230px 1fr; gap: 2rem; }
+}
+
+@media (max-width: 860px) {
+  .shop-layout { grid-template-columns: 1fr; padding: 1.5rem 1.25rem 4rem; }
+}
+
+@media (max-width: 600px) {
+  .products-grid { grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+}
+
+@media (max-width: 380px) {
+  .products-grid { grid-template-columns: 1fr; }
+}
+
+/* Grid cells ko constrain karo — image bahar nahi niklegi */
+.products-grid > app-product-card,
+.products-list > app-product-card {
+  min-width: 0;
+  max-width: 100%;
+  display: block;
+}

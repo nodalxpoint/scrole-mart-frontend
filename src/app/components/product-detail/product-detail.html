@@ -1,0 +1,350 @@
+<!-- product-detail.component.html -->
+
+<!-- Loading State -->
+<div class="pd-loading" *ngIf="loading">
+  <div class="pd-container">
+    <div class="pd-grid">
+      <div class="skel-gallery">
+        <div class="skel-main-img shimmer"></div>
+        <div class="skel-thumbs">
+          <div class="skel-thumb shimmer" *ngFor="let i of [1,2,3,4]"></div>
+        </div>
+      </div>
+      <div class="skel-info">
+        <div class="skel-line w-30 shimmer"></div>
+        <div class="skel-line w-70 shimmer" style="height:48px"></div>
+        <div class="skel-line w-40 shimmer"></div>
+        <div class="skel-line w-90 shimmer"></div>
+        <div class="skel-line w-80 shimmer"></div>
+        <div class="skel-line w-50 shimmer" style="height:52px; margin-top:2rem; border-radius:30px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Error State -->
+<div class="pd-error" *ngIf="!loading && error">
+  <div class="error-icon">🌸</div>
+  <h2>Product not found</h2>
+  <p>The product you're looking for might have moved or is no longer available.</p>
+  <a routerLink="/products" class="btn-back">Browse All Products</a>
+</div>
+
+<!-- Product Detail -->
+<div class="pd-page" *ngIf="!loading && !error && product" [class.visible]="pageVisible">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb-bar">
+    <div class="pd-container">
+      <nav class="breadcrumb-nav">
+        <a routerLink="/" class="bc-link">Home</a>
+        <span class="bc-sep">›</span>
+        <a routerLink="/products" class="bc-link">Products</a>
+        <span class="bc-sep">›</span>
+        <span class="bc-current" *ngIf="product.category">{{ product.category.name }}</span>
+        <span class="bc-sep" *ngIf="product.category">›</span>
+        <span class="bc-current">{{ product.name }}</span>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Main Product Section -->
+  <div class="pd-container">
+    <div class="pd-grid">
+
+      <!-- LEFT: Image Gallery -->
+      <div class="gallery-col">
+
+        <!-- Main Image -->
+        <div class="main-img-wrap">
+          <div class="main-img-inner">
+            <img
+              [src]="activeImage"
+              [alt]="product.name"
+              class="main-img"
+              [class.zoomed]="isZoomed"
+              (mouseenter)="isZoomed = true"
+              (mouseleave)="isZoomed = false"
+              onerror="this.onerror=null; this.style.display='none'; this.parentElement.classList.add('img-error')">
+          </div>
+
+          <!-- Image nav arrows -->
+          <button class="img-nav prev" (click)="prevImage()" *ngIf="images.length > 1">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+          </button>
+          <button class="img-nav next" (click)="nextImage()" *ngIf="images.length > 1">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+
+          <!-- Stock badge on image -->
+          <div class="img-stock-badge out" *ngIf="isFullyOutOfStock">Out of Stock</div>
+          <div class="img-stock-badge low" *ngIf="!isFullyOutOfStock && selectedSize && currentStock > 0 && currentStock <= 5">
+            Only {{ currentStock }} left!
+          </div>
+        </div>
+
+        <!-- Thumbnails -->
+        <div class="thumbnails" *ngIf="images.length > 1">
+          <button
+            *ngFor="let img of images; let i = index"
+            class="thumb-btn"
+            [class.active]="activeImageIndex === i"
+            (click)="setActiveImage(i)">
+            <img [src]="img" [alt]="product.name + ' ' + (i+1)"
+                 onerror="this.onerror=null; this.parentElement.classList.add('thumb-error')">
+          </button>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Product Info -->
+      <div class="info-col">
+
+        <!-- Category + Badge -->
+        <div class="info-top-row">
+          <span class="info-category" *ngIf="product.category">{{ product.category.name }}</span>
+          <span class="info-badge new" *ngIf="isNew">New Arrival</span>
+          <span class="info-badge trending" *ngIf="product.trending === 'Y'">🔥 Trending</span>
+        </div>
+
+        <!-- Product Name -->
+        <h1 class="product-title">{{ product.name }}</h1>
+
+        <!-- Price -->
+        <div class="price-row">
+          <span class="price-main">{{ displayPrice }}</span>
+          <span class="price-off" *ngIf="product.originalPrice">
+            {{ getDiscount() }}% OFF
+          </span>
+        </div>
+
+        <!-- Stock label -->
+        <div class="stock-status-row" *ngIf="selectedSize">
+          <span class="stock-tag" [ngClass]="stockClass">{{ stockLabel }}</span>
+        </div>
+
+        <div class="info-divider"></div>
+
+        <!-- Description -->
+        <p class="product-desc" *ngIf="product.description">{{ product.description }}</p>
+
+        <!-- Size Selector -->
+        <div class="selector-group" *ngIf="sizes.length > 0">
+          <div class="selector-label">
+            Size
+            <span class="selected-val">{{ selectedSize || 'Select' }}</span>
+          </div>
+          <div class="size-options">
+            <button
+              *ngFor="let variant of product.variants"
+              class="size-btn"
+              [class.selected]="selectedSize === variant.size"
+              [class.oos-size]="variant.stock === 0"
+              [disabled]="variant.stock === 0"
+              [title]="variant.stock === 0 ? 'Out of stock' : ''"
+              (click)="selectSize(variant.size)">
+              {{ variant.size }}
+            </button>
+          </div>
+          <p class="size-hint" *ngIf="!selectedSize">Please select a size to continue</p>
+        </div>
+
+        <!-- Quantity Selector -->
+        <div class="selector-group" *ngIf="!isFullyOutOfStock">
+          <div class="selector-label">Quantity</div>
+          <div class="qty-control">
+            <button class="qty-btn" (click)="decrementQty()" [disabled]="qty <= 1">−</button>
+            <span class="qty-val">{{ qty }}</span>
+            <button class="qty-btn" (click)="incrementQty()" [disabled]="qty >= currentStock">+</button>
+            <span class="qty-stock" *ngIf="currentStock > 0">{{ currentStock }} available</span>
+          </div>
+        </div>
+
+        <div class="info-divider"></div>
+
+        <!-- CTA Buttons -->
+        <div class="cta-group" *ngIf="!isFullyOutOfStock && !isSelectedOutOfStock">
+          <button
+            class="btn-add-cart"
+            (click)="addToCart()"
+            [class.added]="addedToCart"
+            [disabled]="!selectedSize">
+            <span *ngIf="!addedToCart">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+              {{ selectedSize ? 'Add to Cart' : 'Select Size First' }}
+            </span>
+            <span *ngIf="addedToCart">✓ Added to Cart!</span>
+          </button>
+          <a routerLink="/cart" class="btn-buy-now" *ngIf="selectedSize">Buy Now</a>
+        </div>
+
+        <!-- Out of stock messages -->
+        <div class="out-of-stock-msg" *ngIf="isFullyOutOfStock">
+          <span>😔 This item is currently out of stock</span>
+        </div>
+        <div class="out-of-stock-msg" *ngIf="!isFullyOutOfStock && isSelectedOutOfStock && selectedSize">
+          <span>😔 This size is out of stock — try another size</span>
+        </div>
+
+        <!-- Perks -->
+        <div class="perks-row">
+          <!-- <div class="perk"><span class="perk-icon">🚚</span><span>Free delivery above ₹999</span></div> -->
+          <div class="perk"><span class="perk-icon">↩️</span><span>7-day easy returns</span></div>
+          <div class="perk"><span class="perk-icon">🔒</span><span>Secure payment</span></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       REVIEWS SECTION
+       ========================================== -->
+  <section class="reviews-section">
+    <div class="pd-container">
+
+      <!-- Section Header -->
+      <div class="reviews-head">
+        <div class="reviews-head-left">
+          <span class="section-eyebrow">What customers say</span>
+          <h2 class="reviews-title">Customer <em>Reviews</em></h2>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="reviews-summary" *ngIf="reviews.length > 0">
+          <div class="avg-score">{{ avgRating | number:'1.1-1' }}</div>
+          <div class="avg-details">
+            <div class="avg-stars">
+              <span
+                *ngFor="let star of getStars(avgRating)"
+                class="rev-star"
+                [class.filled]="star.type === 'full'"
+                [class.half]="star.type === 'half'">
+                {{ star.type === 'empty' ? '☆' : '★' }}
+              </span>
+            </div>
+            <span class="avg-count">Based on {{ reviews.length }} review{{ reviews.length !== 1 ? 's' : '' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="reviews-layout">
+
+        <!-- Left: Review Cards -->
+        <div class="reviews-list-col">
+
+          <!-- Loading -->
+          <div class="reviews-loading" *ngIf="reviewsLoading">
+            <div class="skel-line w-90 shimmer" style="height:100px; border-radius:16px"></div>
+            <div class="skel-line w-90 shimmer" style="height:100px; border-radius:16px; margin-top:12px"></div>
+          </div>
+
+          <!-- Empty State -->
+          <div class="reviews-empty" *ngIf="!reviewsLoading && reviews.length === 0">
+            <div class="empty-icon">✨</div>
+            <p>No reviews yet. Be the first to share your thoughts!</p>
+          </div>
+
+          <!-- Review Cards -->
+          <div class="reviews-list" *ngIf="!reviewsLoading && reviews.length > 0">
+            <div class="review-card" *ngFor="let review of reviews; let i = index" [style.animation-delay]="(i * 0.08) + 's'">
+              <div class="review-card-top">
+                <div class="reviewer-avatar">{{ review.reviewerName.charAt(0).toUpperCase() }}</div>
+                <div class="reviewer-meta">
+                  <span class="reviewer-name">{{ review.reviewerName }}</span>
+                  <div class="review-stars">
+                    <span
+                      *ngFor="let s of [1,2,3,4,5]"
+                      class="rev-star"
+                      [class.filled]="s <= review.rating">
+                      {{ s <= review.rating ? '★' : '☆' }}
+                    </span>
+                  </div>
+                </div>
+                <span class="review-date" *ngIf="review.createdAt">
+                  {{ review.createdAt | date:'MMM d, y' }}
+                </span>
+              </div>
+              <p class="review-msg">{{ review.reviewMsg }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Write a Review Form -->
+        <div class="review-form-col">
+          <div class="review-form-card">
+            <h3 class="form-title">Write a Review</h3>
+
+            <!-- Success State -->
+            <div class="review-success" *ngIf="reviewSubmitted">
+              <div class="success-icon">🎉</div>
+              <p>Thank you for your review!</p>
+              <button class="btn-write-another" (click)="reviewSubmitted = false">Write another</button>
+            </div>
+
+            <!-- Form -->
+            <div *ngIf="!reviewSubmitted">
+              <!-- Star Rating Picker -->
+              <div class="form-group">
+                <label class="form-label">Your Rating <span class="req">*</span></label>
+                <div class="star-picker" (mouseleave)="clearHover()">
+                  <button
+                    *ngFor="let s of [1,2,3,4,5]"
+                    class="star-pick-btn"
+                    [class.filled]="getStarState(s) === 'filled'"
+                    [class.hovered]="getStarState(s) === 'hover'"
+                    type="button"
+                    (mouseenter)="setHover(s)"
+                    (click)="setRating(s)">
+                    ★
+                  </button>
+                </div>
+                <span class="rating-label-text" *ngIf="reviewForm.rating > 0">
+                  {{ ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'][reviewForm.rating] }}
+                </span>
+              </div>
+
+              <!-- Name -->
+              <div class="form-group">
+                <label class="form-label">Your Name <span class="req">*</span></label>
+                <input
+                  class="form-input"
+                  type="text"
+                  placeholder="e.g. Priya Sharma"
+                  [(ngModel)]="reviewForm.reviewerName"
+                  maxlength="60">
+              </div>
+
+              <!-- Message -->
+              <div class="form-group">
+                <label class="form-label">Your Review <span class="req">*</span></label>
+                <textarea
+                  class="form-textarea"
+                  placeholder="Share your experience with this product…"
+                  [(ngModel)]="reviewForm.reviewMsg"
+                  rows="4"
+                  maxlength="500">
+                </textarea>
+                <span class="char-count">{{ reviewForm.reviewMsg.length }}/500</span>
+              </div>
+
+              <!-- Error -->
+              <p class="review-error" *ngIf="reviewError">{{ reviewError }}</p>
+
+              <!-- Submit -->
+              <button
+                class="btn-submit-review"
+                (click)="submitReview()"
+                [disabled]="reviewSubmitting">
+                <span *ngIf="!reviewSubmitting">Submit Review</span>
+                <span *ngIf="reviewSubmitting" class="submitting-dots">Submitting…</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</div>

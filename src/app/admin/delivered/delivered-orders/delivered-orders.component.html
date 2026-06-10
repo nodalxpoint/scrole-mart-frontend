@@ -1,0 +1,222 @@
+<!-- src/app/admin/delivered/delivered-orders/delivered-orders.component.html -->
+<div class="orders-page">
+
+  <!-- ── TOP BAR ── -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+
+      <div class="search-wrap" [class.searching]="searchLoading">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+        </svg>
+        <input class="search-input" type="text"
+               placeholder="Search by tracking key..."
+               [(ngModel)]="searchQuery" (input)="onSearchInput()">
+        <span class="search-spinner" *ngIf="searchLoading"></span>
+        <button class="search-clear" *ngIf="searchQuery && !searchLoading"
+                (click)="clearSearch()">✕</button>
+      </div>
+
+      <div class="delivered-chip">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        Delivered Orders
+      </div>
+
+    </div>
+
+    <div class="stat-chips">
+      <div class="stat-chip">
+        <span class="chip-val">{{ totalElements }}</span>
+        <span class="chip-lbl">Delivered</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ERROR ── -->
+  <div class="error-alert" *ngIf="error">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="8" x2="12" y2="12"/>
+      <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    {{ error }}
+    <button (click)="error=''">✕</button>
+  </div>
+
+  <!-- ── LOADING ── -->
+  <div class="loading-wrap" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading delivered orders...</p>
+  </div>
+
+  <!-- ── TABLE ── -->
+  <div class="table-card" *ngIf="!loading">
+
+    <div class="table-meta">
+      <span class="results-info">
+        <ng-container *ngIf="isSearchMode">
+          {{ totalElements }} result{{ totalElements !== 1 ? 's' : '' }} for
+          <span class="search-keyword-tag">"{{ searchQuery }}"</span>
+        </ng-container>
+        <ng-container *ngIf="!isSearchMode">
+          Showing {{ startIndex + 1 }}–{{ endIndex }} of {{ totalElements }} delivered orders
+        </ng-container>
+      </span>
+      <div class="page-size-wrap">
+        <span>Show</span>
+        <select [(ngModel)]="pageSize" (change)="onPageSizeChange()">
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+        </select>
+        <span>per page</span>
+      </div>
+    </div>
+
+    <div class="table-wrap" *ngIf="pagedOrders.length > 0">
+      <table>
+        <thead>
+          <tr>
+            <th class="sortable" (click)="sort('orderId')">
+              Order ID
+              <span class="sort-arrow" [class.active]="sortField==='orderId'">
+                {{ sortDir==='asc' && sortField==='orderId' ? '↑' : '↓' }}
+              </span>
+            </th>
+            <th>Customer</th>
+            <th>Tracking Key</th>
+            <th class="sortable" (click)="sort('amount')">
+              Amount
+              <span class="sort-arrow" [class.active]="sortField==='amount'">
+                {{ sortDir==='asc' && sortField==='amount' ? '↑' : '↓' }}
+              </span>
+            </th>
+            <th>Payment</th>
+            <th class="sortable" (click)="sort('dtOfOps')">
+              Date
+              <span class="sort-arrow" [class.active]="sortField==='dtOfOps'">
+                {{ sortDir==='asc' && sortField==='dtOfOps' ? '↑' : '↓' }}
+              </span>
+            </th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let order of pagedOrders; let i = index"
+              class="table-row"
+              [style.animation-delay]="(i * 0.04) + 's'"
+              (click)="openDetail(order)">
+
+            <td><span class="order-id">#{{ order.orderId }}</span></td>
+
+            <td>
+              <div class="customer-cell">
+                <span class="customer-name">{{ order.name }}</span>
+                <span class="customer-email" *ngIf="order.email">{{ order.email }}</span>
+              </div>
+            </td>
+
+            <td>
+              <div class="tracking-cell" (click)="$event.stopPropagation()">
+                <span class="tracking-key" *ngIf="order.trckngKey">{{ order.trckngKey }}</span>
+                <span class="tracking-empty" *ngIf="!order.trckngKey">—</span>
+                <button
+                  *ngIf="order.trckngKey"
+                  class="copy-btn"
+                  [class.copied]="copiedKey === order.trckngKey"
+                  (click)="copyTrackingKey($event, order.trckngKey!)"
+                  title="Copy tracking key">
+                  <svg *ngIf="copiedKey !== order.trckngKey" width="13" height="13" viewBox="0 0 24 24"
+                       fill="none" stroke="currentColor" stroke-width="2"
+                       stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2"/>
+                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                  </svg>
+                  <svg *ngIf="copiedKey === order.trckngKey" width="13" height="13" viewBox="0 0 24 24"
+                       fill="none" stroke="currentColor" stroke-width="2.5"
+                       stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+
+            <td class="price-cell">₹{{ order.amount | number:'1.0-0' }}</td>
+
+            <td>
+              <span class="payment-badge"
+                    [class.pay-success]="order.paymentStatus === 'SUCCESS'"
+                    [class.pay-pending]="order.paymentStatus !== 'SUCCESS'">
+                {{ order.paymentStatus }}
+              </span>
+            </td>
+
+            <td class="date-cell">
+              <span class="date-main">{{ formatDtOfOps(order.dtOfOps) }}</span>
+              <span class="date-time" *ngIf="order.updatedDtOfOps && order.updatedDtOfOps !== order.dtOfOps">
+                Upd: {{ formatDtOfOps(order.updatedDtOfOps) }}
+              </span>
+            </td>
+
+            <td>
+              <span class="status-badge status-DELIVERED">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                     style="margin-right:4px;vertical-align:middle;">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                DELIVERED
+              </span>
+            </td>
+
+            <td>
+              <div class="action-btns" (click)="$event.stopPropagation()">
+                <button class="btn-icon view" (click)="openDetail(order)" title="View Details">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                       stroke="currentColor" stroke-width="2"
+                       stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="pagedOrders.length === 0 && !loading">
+      <span class="empty-icon">✅</span>
+      <h3>No delivered orders yet</h3>
+      <p>Orders will appear here once they are marked as delivered</p>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button class="pg-btn" (click)="goToPage(0)"             [disabled]="currentPage===0">«</button>
+      <button class="pg-btn" (click)="goToPage(currentPage-1)" [disabled]="currentPage===0">‹</button>
+      <ng-container *ngFor="let pg of pageNumbers">
+        <button class="pg-btn"
+                [class.active]="pg===currentPage"
+                [class.ellipsis]="pg===-1"
+                [disabled]="pg===-1"
+                (click)="pg!==-1 && goToPage(pg)">
+          {{ pg===-1 ? '…' : displayPage(pg) }}
+        </button>
+      </ng-container>
+      <button class="pg-btn" (click)="goToPage(currentPage+1)" [disabled]="currentPage===totalPages-1">›</button>
+      <button class="pg-btn" (click)="goToPage(totalPages-1)"  [disabled]="currentPage===totalPages-1">»</button>
+    </div>
+
+  </div>
+
+</div>

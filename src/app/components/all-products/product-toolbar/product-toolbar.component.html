@@ -1,0 +1,55 @@
+<!-- product-toolbar.component.html -->
+<div class="products-toolbar">
+  <div class="toolbar-left">
+    <button class="filter-toggle-btn" (click)="filterToggle.emit(); $event.stopPropagation()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+      </svg>
+      Filters
+      <span class="filter-badge" *ngIf="hasActiveFilters">{{ activeFilterCount }}</span>
+    </button>
+    <span class="result-count" *ngIf="!loading">
+      <strong>{{ totalElements }}</strong> {{ totalElements === 1 ? 'product' : 'products' }}
+    </span>
+  </div>
+
+  <div class="toolbar-right">
+    <div class="view-toggle">
+      <button class="view-btn" [class.active]="viewMode === 'grid'" (click)="viewModeChange.emit('grid')" title="Grid view">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+          <rect x="3" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/>
+          <rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+      </button>
+      <button class="view-btn" [class.active]="viewMode === 'list'" (click)="viewModeChange.emit('list')" title="List view">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Active Filter Tags -->
+<div class="active-filters" *ngIf="hasActiveFilters">
+  <span class="active-filter-tag" *ngIf="keyword">
+    "{{ keyword }}"
+    <button (click)="clearSearch.emit()">×</button>
+  </span>
+  <span class="active-filter-tag" *ngIf="category">
+    {{ category }}
+    <button (click)="clearCategory.emit()">×</button>
+  </span>
+  <span class="active-filter-tag" *ngIf="minPrice">
+    From ₹{{ minPrice }}
+    <button (click)="clearMinPrice.emit()">×</button>
+  </span>
+  <span class="active-filter-tag" *ngIf="maxPrice">
+    Up to ₹{{ maxPrice }}
+    <button (click)="clearMaxPrice.emit()">×</button>
+  </span>
+</div>

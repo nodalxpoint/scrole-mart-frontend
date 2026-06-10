@@ -1,0 +1,147 @@
+<!-- product-card.component.html -->
+<div
+  class="product-card"
+  [class.list-card]="viewMode === 'list'"
+  [class.card-oos]="isFullyOutOfStock"
+  [class.visible]="visible"
+  [style.animation-delay]="animationDelay">
+
+  <!-- ── IMAGE ── -->
+  <div class="card-img-wrap" (click)="cardClick.emit(product.id)">
+
+    <div class="card-badges">
+      <span class="card-badge badge-trending" *ngIf="product.trending === 'Y'">🔥 Trending</span>
+      <span class="card-badge badge-new"      *ngIf="isNew">New</span>
+    </div>
+
+    <span class="badge-oos-corner" *ngIf="isFullyOutOfStock">Out of Stock</span>
+
+    <img
+      [src]="productImage"
+      [alt]="product.name"
+      class="card-img"
+      [class.img-dimmed]="isFullyOutOfStock"
+      onerror="this.onerror=null;this.style.display='none';this.parentElement.style.background='#FFE3E1';" />
+
+    <div class="card-hover-overlay" *ngIf="!isFullyOutOfStock">
+      <span class="overlay-pill">View Details</span>
+    </div>
+  </div>
+
+  <!-- ── INFO ── -->
+  <div class="card-info" (click)="$event.stopPropagation()">
+
+    <!-- Category + Name + Price -->
+    <div class="card-meta" (click)="cardClick.emit(product.id)">
+      <span class="card-category" *ngIf="product.category">{{ product.category.name }}</span>
+      <h3 class="card-name">{{ product.name }}</h3>
+      <div class="card-price-row">
+        <span class="card-price">{{ selectedPrice }}</span>
+        <span class="stock-pill pill-in"  *ngIf="!isFullyOutOfStock">In Stock</span>
+        <span class="stock-pill pill-oos" *ngIf="isFullyOutOfStock">Out of Stock</span>
+      </div>
+    </div>
+
+    <!-- OOS block -->
+    <div class="oos-block" *ngIf="isFullyOutOfStock">
+      <p class="oos-msg">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+        </svg>
+        Currently Unavailable
+      </p>
+      <button class="notify-btn" (click)="$event.stopPropagation()">🔔 Notify Me</button>
+    </div>
+
+    <!-- IN-STOCK CONTROLS -->
+    <div class="card-controls" *ngIf="!isFullyOutOfStock">
+
+      <!-- Size dropdown -->
+      <div class="size-select-wrap" *ngIf="product.variants.length > 1">
+        <label class="size-label">SIZE</label>
+        <div class="size-select-box">
+          <select
+            class="size-select"
+            [value]="selectedVariantSize"
+            (change)="variantChange.emit({ productId: product.id, size: $any($event.target).value })">
+            <option
+              *ngFor="let v of product.variants"
+              [value]="v.size"
+              [disabled]="v.stock === 0"
+              [selected]="selectedVariantSize === v.size">
+              {{ v.size }}{{ v.stock === 0 ? ' (OOS)' : '' }}
+            </option>
+          </select>
+          <svg class="select-chevron" width="14" height="14" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2.5"
+               stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Qty + ATC -->
+      <div class="bottom-row">
+
+        <div class="qty-box">
+          <button class="qty-btn"
+                  (click)="decrementQty.emit(product.id)"
+                  [disabled]="qty <= 1">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+          <span class="qty-num">{{ qty }}</span>
+          <button class="qty-btn"
+                  (click)="incrementQty.emit(product.id)"
+                  [disabled]="qty >= (selectedVariantStock ?? 99)">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+        </div>
+
+        <button
+          class="atc-btn"
+          [class.atc-loading]="cartState === 'loading'"
+          [class.atc-added]="cartState === 'added'"
+          [disabled]="cartState !== 'idle'"
+          (click)="addToCart.emit(product)">
+
+          <span class="atc-inner" *ngIf="cartState === 'idle'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 01-8 0"/>
+            </svg>
+            Add to Cart
+          </span>
+
+          <span class="atc-inner" *ngIf="cartState === 'loading'">
+            <span class="atc-spinner"></span>
+            Adding...
+          </span>
+
+          <span class="atc-inner" *ngIf="cartState === 'added'">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="3"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Added!
+          </span>
+
+        </button>
+      </div>
+
+      <p class="atc-error" *ngIf="cartError">⚠ {{ cartError }}</p>
+    </div>
+
+  </div>
+</div>

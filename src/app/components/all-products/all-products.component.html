@@ -1,0 +1,101 @@
+<!-- all-products.component.html -->
+<div class="shop-page" (click)="onPageClick($event)">
+
+  <!-- PAGE HEADER -->
+  <app-product-header></app-product-header>
+
+  <!-- SIDEBAR BACKDROP (mobile) -->
+  <div class="sidebar-backdrop" [class.visible]="filterOpen" (click)="filterOpen = false"></div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="shop-layout">
+
+    <!-- FILTER SIDEBAR -->
+    <app-product-filter-sidebar
+      [isOpen]="filterOpen"
+      [categories]="categories"
+      [selectedCategory]="filters.category"
+      [keyword]="filters.keyword"
+      [minPrice]="filters.minPrice"
+      [maxPrice]="filters.maxPrice"
+      [hasActiveFilters]="hasActiveFilters"
+      (closeFilter)="filterOpen = false"
+      (searchInput)="onSearchInput($event)"
+      (clearSearch)="clearSearch()"
+      (categoryChange)="setCategory($event)"
+      (priceChange)="onPriceChange($event)"
+      (clearAll)="clearAllFilters()">
+    </app-product-filter-sidebar>
+
+    <!-- PRODUCTS AREA -->
+    <main class="products-area">
+
+      <!-- TOOLBAR -->
+      <app-product-toolbar
+        [loading]="loading"
+        [totalElements]="totalElements"
+        [viewMode]="viewMode"
+        [hasActiveFilters]="hasActiveFilters"
+        [activeFilterCount]="activeFilterCount"
+        [keyword]="filters.keyword"
+        [category]="filters.category"
+        [minPrice]="filters.minPrice"
+        [maxPrice]="filters.maxPrice"
+        (filterToggle)="filterOpen = !filterOpen"
+        (viewModeChange)="viewMode = $event"
+        (clearSearch)="clearSearch()"
+        (clearCategory)="setCategory('')"
+        (clearMinPrice)="filters.minPrice = null; applyFilters()"
+        (clearMaxPrice)="filters.maxPrice = null; applyFilters()">
+      </app-product-toolbar>
+
+      <!-- Loading Skeleton -->
+      <div class="products-grid" *ngIf="loading">
+        <div class="skel-card shimmer" *ngFor="let i of skeletonArr"></div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!loading && products.length === 0">
+        <div class="empty-icon">🌸</div>
+        <h3>No products found</h3>
+        <p>Try adjusting your filters or search terms</p>
+        <button class="clear-filters-btn" (click)="clearAllFilters()">Clear Filters</button>
+      </div>
+
+      <!-- Products Grid / List -->
+      <div [class]="viewMode === 'grid' ? 'products-grid' : 'products-list'" *ngIf="!loading && products.length > 0">
+        <app-product-card
+          *ngFor="let product of products; let i = index"
+          [product]="product"
+          [viewMode]="viewMode"
+          [visible]="cardsVisible"
+          [animationDelay]="(i % pageSize * 0.055) + 's'"
+          [productImage]="getProductImage(product)"
+          [isFullyOutOfStock]="isFullyOutOfStock(product)"
+          [isNew]="isNew(product.createdAt)"
+          [selectedPrice]="getSelectedPrice(product)"
+          [selectedVariantSize]="getSelectedVariantSize(product.id)"
+          [selectedVariantId]="getSelectedVariantId(product.id)"
+          [selectedVariantStock]="getSelectedVariant(product.id)?.stock ?? null"
+          [qty]="getQty(product.id)"
+          [cartState]="getCartState(product.id)"
+          [cartError]="getCartError(product.id)"
+          (cardClick)="goToProduct($event)"
+          (variantChange)="selectVariantBySize($event.productId, $event.size, product.variants)"
+          (incrementQty)="incrementQty($event)"
+          (decrementQty)="decrementQty($event)"
+          (addToCart)="onAddToCart($event)">
+        </app-product-card>
+      </div>
+
+      <!-- PAGINATION -->
+      <app-product-pagination
+        *ngIf="!loading"
+        [currentPage]="currentPage"
+        [totalPages]="totalPages"
+        (pageChange)="goToPage($event)">
+      </app-product-pagination>
+
+    </main>
+  </div>
+</div>
